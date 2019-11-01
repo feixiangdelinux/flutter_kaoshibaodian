@@ -5,24 +5,28 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_kaoshibaodian/view/ForgetPwd.dart';
-import 'package:flutter_kaoshibaodian/view/Main.dart';
+import 'package:flutter_kaoshibaodian/view/WebView.dart';
 import 'package:flutter_kaoshibaodian/view/entity/user_login_entity.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 //登录页
 class LoginPager extends StatelessWidget {
-  /// 登录操作
-  void postHttp(BuildContext context) async {
-    //UserLoginBean
+  //手机号的控制器
+  TextEditingController phoneController = TextEditingController();
 
+  //密码的控制器
+  TextEditingController passController = TextEditingController();
+
+  /// 登录操作
+  void postHttp(BuildContext context, String userName, String password) async {
     var dio = Dio(BaseOptions(
       responseType: ResponseType.plain,
     ));
     try {
       Response response = await dio
           .post("https://slb-user-test.ksbao.com/api/user/userlogin", data: {
-        "username": "17022209583",
-        "password": md5.convert(utf8.encode("123456")).toString(),
+        "username": userName,
+        "password": md5.convert(utf8.encode(password)).toString(),
         "clientType": "Android原生",
         "userAgent": "client_android"
       });
@@ -37,7 +41,10 @@ class LoginPager extends StatelessWidget {
         );
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => MainPager()),
+//            MaterialPageRoute(builder: (context) => MainPager()),
+            MaterialPageRoute(
+                builder: (context) =>
+                    WebViewPager(title: "zhangsan", url: "sdfsdf")),
             (route) => route == null);
       } else {
         Fluttertoast.showToast(
@@ -103,6 +110,7 @@ class LoginPager extends StatelessWidget {
             height: 45.0,
             margin: EdgeInsets.fromLTRB(30.0, 90.0, 25.0, 0.0),
             child: TextField(
+              controller: phoneController,
               decoration: InputDecoration(
                 icon: Image.asset(
                   "resource/images/login_iphone.png",
@@ -120,6 +128,7 @@ class LoginPager extends StatelessWidget {
               children: <Widget>[
                 TextField(
                   obscureText: true,
+                  controller: passController,
                   decoration: InputDecoration(
                     icon: Image.asset(
                       "resource/images/login_pwdhide.png",
@@ -159,7 +168,7 @@ class LoginPager extends StatelessWidget {
             margin: EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 0.0),
             child: FlatButton(
               onPressed: () {
-                postHttp(context);
+                postHttp(context, phoneController.text, passController.text);
               },
               child: Text(
                 "登录",
